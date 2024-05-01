@@ -1,10 +1,10 @@
-const db = require("../config/db");
-const COURSES = require("./course.model");
-const USERS = require("./user.model");
-const ADMINS  = require("./admin.model");
-const TEACHERS = require("./teacher.model");
-const COURSE_STUDENT = require("./courseStudent.model");
-const ACTIVITIES = require("./activity.model");
+import db from "../config/db.js";
+import COURSES from "./course.model.js";
+import USERS from "./user.model.js";
+import ADMINS  from "./admin.model.js";
+import TEACHERS from "./teacher.model.js";
+import COURSE_STUDENT from "./courseStudent.model.js";
+import ACTIVITIES from "./activity.model.js";
 
 TEACHERS.hasMany(COURSES ,  { foreignKey: 'teacherId' });
 COURSES.belongsTo(TEACHERS , { foreignKey: 'teacherId' });
@@ -22,3 +22,5 @@ db.authenticate().then(()=>{
   .catch((err)=>{
     console.log(err);
   });
+
+export { COURSES , ADMINS , TEACHERS , USERS , ACTIVITIES , COURSE_STUDENT};

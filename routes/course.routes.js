@@ -1,18 +1,24 @@
-const express = require("express");
-const COURSES = require("../models/course.model");
-const TEACHERS = require("../models/teacher.model");
-const ACTIVITIES = require("../models/activity.model");
-const COURSE_STUDENT = require("../models/courseStudent.model");
+import express from"express"
+import {ACTIVITIES , TEACHERS , COURSES , COURSE_STUDENT} from"../models/index.models.js";
+import ApiErrorResponse from'../helpers/ApiErrorResponse.js'
+import ApiResponse from"../helpers/ApiResponse.js"
+import { verifyAdmin, verifyUser, verifyTeacher } from"../middlewares/verifyToken.js"
+
 const router = express.Router();
-const ApiErrorResponse = require('../helpers/ApiErrorResponse');
-const ApiResponse = require("../helpers/ApiResponse");
-const { verifyAdmin, verifyUser, verifyTeacher } = require("../middlewares/verifyToken");
 
 router.get("/", async (req, res) => {
     try {
-        const cousrses = await COURSES.findAll();
+        const cousrses = await COURSES.findAll({
+            attributes : ["id", "name" , "price"],
+            raw : true,
+            include : {
+                attributes: ["name"],
+                model: TEACHERS
+            }
+        });
         res.send(ApiResponse.success(cousrses));
     } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 })
@@ -144,4 +150,4 @@ router.delete("/:id", verifyAdmin, async (req, res) => {
     }
 })
 
-module.exports = router;
+export default router;

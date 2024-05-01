@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+import {Sequelize} from "sequelize";
 
 const sequalize = new Sequelize({
   host: process.env.HOST || "localhost",
@@ -8,4 +8,4 @@ const sequalize = new Sequelize({
   database: process.env.DB_DATABASE || "kindergarten",
 });
 
-module.exports = sequalize;
+export default sequalize;

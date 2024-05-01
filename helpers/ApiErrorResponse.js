@@ -1,4 +1,4 @@
-const ApiResponse = require('./ApiResponse');
+import ApiResponse from './ApiResponse.js';
 
 class Erros {
     static BadRequest(message) {
@@ -22,4 +22,4 @@ class Erros {
     }
 }
 
-module.exports = Erros;
+export default Erros;

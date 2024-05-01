@@ -1,7 +1,7 @@
-const db = require("../config/db")
-const { DataTypes } = require("sequelize")
+import db from "../config/db.js"
+import {DataTypes} from "sequelize"
 
-module.exports = db.define("activities", {
+export default db.define("activities", {
     id: {
         type: DataTypes.INTEGER(11),
         allowNull: false,

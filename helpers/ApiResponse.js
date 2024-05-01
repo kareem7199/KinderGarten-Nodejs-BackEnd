@@ -32,4 +32,4 @@ class ApiResponse {
     }
 }
 
-module.exports = ApiResponse; // Exporting for use in Node.js
+export default ApiResponse; // Exporting for use in Node.js

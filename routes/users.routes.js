@@ -1,13 +1,14 @@
-const express = require("express");
-const USERS = require("../models/user.model");
+import express from "express";
+import USERS from "../models/user.model.js";
+import ApiErrorResponse from '../helpers/ApiErrorResponse.js';
+import ApiResponse from "../helpers/ApiResponse.js";
+import bcrypt from "bcryptjs";
+import moment from 'moment'; 
+import jwt from "jsonwebtoken";
+import { verifyAdmin, verifyUser } from "../middlewares/verifyToken.js";
+import { uploadUserProfilePicture } from "../middlewares/fileupload.js";
+
 const router = express.Router();
-const ApiErrorResponse = require('../helpers/ApiErrorResponse');
-const ApiResponse = require("../helpers/ApiResponse");
-const bcrypt = require("bcryptjs");
-const moment = require('moment');
-const jwt = require("jsonwebtoken");
-const { verifyAdmin, verifyUser } = require("../middlewares/verifyToken");
-const { uploadUserProfilePicture } = require("../middlewares/fileupload");
 
 router.get("/", verifyAdmin, async (req, res) => {
     try {
@@ -119,4 +120,4 @@ router.delete("/:id", verifyAdmin, async (req, res) => {
     }
 })
 
-module.exports = router;
+export default router;

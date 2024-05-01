@@ -1,13 +1,14 @@
-const express = require("express");
-const TEACHERS = require("../models/teacher.model");
-const COURSES = require("../models/course.model");
+import express from"express"
+import bcrypt from"bcryptjs"
+import jwt from"jsonwebtoken"
+import TEACHERS from"../models/teacher.model.js"
+import COURSES from"../models/course.model.js"
+import ApiErrorResponse from'../helpers/ApiErrorResponse.js'
+import ApiResponse from"../helpers/ApiResponse.js"
+import { verifyAdmin, verifyTeacher } from"../middlewares/verifyToken.js"
+import { uploadTeacherProfilePicture } from"../middlewares/fileupload.js"
+
 const router = express.Router();
-const ApiErrorResponse = require('../helpers/ApiErrorResponse');
-const ApiResponse = require("../helpers/ApiResponse");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { verifyAdmin, verifyTeacher } = require("../middlewares/verifyToken");
-const { uploadTeacherProfilePicture } = require("../middlewares/fileupload");
 
 router.get("/", verifyAdmin, async (req, res) => {
     try {
@@ -123,4 +124,4 @@ router.delete("/:id", verifyAdmin, async (req, res) => {
     }
 })
 
-module.exports = router;
+export default router;

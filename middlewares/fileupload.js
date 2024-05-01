@@ -1,5 +1,5 @@
-var fs = require("fs");
-const multer = require("multer");
+import multer from "multer";
+import fs from "fs"
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -68,36 +68,36 @@ const userProfilePictureStorage = multer.diskStorage({
   },
 });
 const teacherProfilePictureStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-  
-      if (
-        !fs.existsSync(
-          `${__dirname}/../uploads/teachers`
-        )
-      ) {
-        fs.mkdirSync(
-          `${__dirname}/../uploads/teachers`,
-          {
-            recursive: true,
-          }
-        );
-      }
-      cb(
-        null,
+  destination: function (req, file, cb) {
+
+    if (
+      !fs.existsSync(
         `${__dirname}/../uploads/teachers`
+      )
+    ) {
+      fs.mkdirSync(
+        `${__dirname}/../uploads/teachers`,
+        {
+          recursive: true,
+        }
       );
-  
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix =
-        Date.now() +
-        "-" +
-        Math.round(Math.random() * 1e9);
-      const ext = file.mimetype.split("/")[1];
-  
-      cb(null, 0 + "-" + uniqueSuffix + `.${ext}`);
-    },
-  });
+    }
+    cb(
+      null,
+      `${__dirname}/../uploads/teachers`
+    );
+
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix =
+      Date.now() +
+      "-" +
+      Math.round(Math.random() * 1e9);
+    const ext = file.mimetype.split("/")[1];
+
+    cb(null, 0 + "-" + uniqueSuffix + `.${ext}`);
+  },
+});
 const allowedFiles = (req, file, cb) => {
   if (
     !file.originalname.match(
@@ -125,11 +125,11 @@ const userProfilePictureUploader = multer({
   limits: { fileSize: 1024 * 1024 * 3 },
 })
 const teacherProfilePictureUploader = multer({
-    storage: teacherProfilePictureStorage,
-    fileFilter: allowedFiles,
-    limits: { fileSize: 1024 * 1024 * 3 },
-  })
-const multiFiles = (keysHandler) => {
+  storage: teacherProfilePictureStorage,
+  fileFilter: allowedFiles,
+  limits: { fileSize: 1024 * 1024 * 3 },
+})
+export const multiFiles = (keysHandler) => {
   return (req, res, next) => {
     const files = upload.fields(keysHandler);
 
@@ -148,7 +148,7 @@ const multiFiles = (keysHandler) => {
     });
   };
 };
-const uploadUserProfilePicture = () => {
+export const uploadUserProfilePicture = () => {
   return (req, res, next) => {
     const file = userProfilePictureUploader.single("image");
 
@@ -168,25 +168,23 @@ const uploadUserProfilePicture = () => {
     });
   };
 };
-const uploadTeacherProfilePicture = () => {
-    return (req, res, next) => {
-      const file = teacherProfilePictureUploader.single("image");
-  
-      file(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-          console.log(err)
-          res.status(400).send({
-            message:
-              "Error while uploading media :( Make sure you are uploading a PNG, JPG or JPEG file with less than 3 MBs of space",
-          });
-        } else if (err) {
-          res.status(503).send({
-            message:
-              "Server Error while uploading media :(",
-          });
-        } else next();
-      });
-    };
-  };
+export const uploadTeacherProfilePicture = () => {
+  return (req, res, next) => {
+    const file = teacherProfilePictureUploader.single("image");
 
-module.exports = { multiFiles, uploadUserProfilePicture , uploadTeacherProfilePicture};
+    file(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        console.log(err)
+        res.status(400).send({
+          message:
+            "Error while uploading media :( Make sure you are uploading a PNG, JPG or JPEG file with less than 3 MBs of space",
+        });
+      } else if (err) {
+        res.status(503).send({
+          message:
+            "Server Error while uploading media :(",
+        });
+      } else next();
+    });
+  };
+};

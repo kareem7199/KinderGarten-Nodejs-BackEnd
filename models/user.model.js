@@ -1,34 +1,35 @@
-const db = require("../config/db")
-const { DataTypes } = require("sequelize")
+import db from "../config/db.js"
+import { DataTypes } from "sequelize"
 
-module.exports = db.define("users", {
-    id :{ 
-        type :DataTypes.INTEGER(11),
-        allowNull : false,
-        primaryKey:true,
-        autoIncrement:true,
+
+export default db.define("users", {
+    id: {
+        type: DataTypes.INTEGER(11),
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true,
     },
-    name : {
-        type : DataTypes.STRING(255),
+    name: {
+        type: DataTypes.STRING(255),
         allowNull: false
-    } ,
-    birthDate : {
-        type : DataTypes.DATEONLY,
+    },
+    birthDate: {
+        type: DataTypes.DATEONLY,
         allowNull: false
-    } ,
-    password : {
-        type : DataTypes.STRING(255),
+    },
+    password: {
+        type: DataTypes.STRING(255),
         allowNull: false
-    } ,
-    parentPhone : {
-        type : DataTypes.STRING(11) ,
-        allowNull: false ,
+    },
+    parentPhone: {
+        type: DataTypes.STRING(11),
+        allowNull: false,
         // unique : true,
-    } ,
-    profilePicture : {
-        type : DataTypes.STRING(255) ,
-        allowNull : false
-    } ,
+    },
+    profilePicture: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+    },
     createdAt: {
         type: DataTypes.DATEONLY,
         defaultValue: DataTypes.NOW,

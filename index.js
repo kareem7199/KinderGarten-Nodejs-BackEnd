@@ -1,27 +1,24 @@
-const express = require("express");
-const db = require("./config/db");
+import express from "express"
+import db from "./config/db.js"
+import cors from "cors"
+import 'dotenv/config'
+import userRoutes from "./routes/users.routes.js"
+import adminRoutes from "./routes/admins.routes.js"
+import teacherRoutes from "./routes/teacher.routes.js"
+import courseRoutes from "./routes/course.routes.js";
+
 const app = express();
-const dbconnection = require("./models/index.models")
+
 app.use(express.json());
 
-const cors = require("cors");
-require("dotenv").config();
 app.use(cors());
 
-const originalSend = app.response.send;
-app.response.send = function sendOverWrite(body) {
-  originalSend.call(this, body);
-  this.__custombody__ = body;
-};
-
-
-
 app.use("/uploads", express.static("./uploads"));
-app.use(require("./middlewares/logging"));
-app.use("/users" , require("./routes/users.routes"));
-app.use("/admins" , require("./routes/admins.routes"));
-app.use("/teachers" , require("./routes/teacher.routes"));
-app.use("/courses" , require("./routes/course.routes"));
+
+app.use("/users" , userRoutes);
+app.use("/admins" , adminRoutes);
+app.use("/teachers" , teacherRoutes);
+app.use("/courses" , courseRoutes);
 
 app.get("/", (req, res) => {
   res.send("The Server is running!🫡");
