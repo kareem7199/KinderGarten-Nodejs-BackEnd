@@ -1,5 +1,4 @@
 import express from "express"
-import db from "./config/db.js"
 import cors from "cors"
 import 'dotenv/config'
 import userRoutes from "./routes/users.routes.js"
