@@ -1,4 +1,4 @@
-import { ACTIVITIES, TEACHERS, COURSES, COURSE_STUDENT } from "../models/index.models.js"
+import { ACTIVITIES, TEACHERS, COURSES, COURSE_STUDENT , USERS} from "../models/index.models.js"
 import ApiErrorResponse from '../helpers/ApiErrorResponse.js'
 import ApiResponse from "../helpers/ApiResponse.js"
 
@@ -42,6 +42,36 @@ export const getCourse = async (req, res) => {
 
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError(500));
+    }
+}
+
+export const getPendingRequests = async (req, res) => {
+    try {
+        
+        const result = await COURSE_STUDENT.findAll({
+            raw: true,
+            where : {
+                isPaid : false
+            } ,
+             attributes : ['id'],
+            include : [
+                {
+                    model : COURSES ,
+                    attributes: [ 'name' ],
+                } ,
+                {
+                    model : USERS ,
+                    attributes: [ 'name' ],
+                }
+            ]
+        })
+
+        res.send(ApiResponse.success(result));
+
+    } catch (error) {
+
+        console.log(error)
+        res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
 
@@ -111,6 +141,51 @@ export const createCourse = async (req, res) => {
         console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
+}
+
+export const acceptRequest = async (req, res) => {
+    try {
+
+        const id = req.body.id;
+        
+        const request = await COURSE_STUDENT.findByPk(id);
+
+        if (!request)
+            return res.status(404).send(ApiErrorResponse.NotFound());
+
+        request.isPaid = true;
+
+        await request.save();
+
+        res.send(ApiResponse.success(request, "request Accepted successfully"));
+
+    } catch (error) {
+        res.status(500).send(ApiErrorResponse.InternalServerError());
+    }
+}
+
+export const rejectRequest = async (req, res) => {
+
+    try {
+        
+        const id = req.body.id;
+
+        const request = await COURSE_STUDENT.findByPk(id);
+
+        if(!request)
+            return res.status(404).send(ApiErrorResponse.NotFound());
+        
+        if(request.isPaid)
+            return res.status(400).send(ApiErrorResponse.BadRequest());
+
+        await request.destroy();
+
+        res.send(ApiResponse.success(request, "request Rejected successfully"));
+
+    } catch (error) {
+        res.status(500).send(ApiErrorResponse.InternalServerError());
+    }
+
 }
 
 export const updateCourse = async (req, res) => {
