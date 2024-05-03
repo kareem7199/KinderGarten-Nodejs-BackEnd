@@ -12,7 +12,9 @@ COURSES.belongsTo(TEACHERS , { foreignKey: 'teacherId' });
 COURSES.belongsToMany(USERS, { through: COURSE_STUDENT});
 USERS.belongsToMany(COURSES, { through: COURSE_STUDENT});
 
+COURSES.hasMany(COURSE_STUDENT);
 COURSE_STUDENT.belongsTo(COURSES);
+
 COURSE_STUDENT.belongsTo(USERS);
 
 

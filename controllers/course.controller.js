@@ -1,7 +1,7 @@
-import { ACTIVITIES, TEACHERS, COURSES, COURSE_STUDENT , USERS} from "../models/index.models.js"
+import { ACTIVITIES, TEACHERS, COURSES, COURSE_STUDENT, USERS } from "../models/index.models.js"
 import ApiErrorResponse from '../helpers/ApiErrorResponse.js'
 import ApiResponse from "../helpers/ApiResponse.js"
-
+import { Sequelize } from "sequelize"
 
 export const getCourses = async (req, res) => {
     try {
@@ -45,23 +45,79 @@ export const getCourse = async (req, res) => {
     }
 }
 
+export const getCoursesWithSelectionStatus = async (req, res) => {
+
+    try {
+
+        const selectedCourses = await COURSES.findAll({
+            attributes: [
+                'id',
+                'name',
+                'price',
+                [
+                    Sequelize.literal('TRUE'),
+                    'isSelected'
+                ] ,
+            ], 
+            raw : true ,
+            include: [
+                {
+                    model: COURSE_STUDENT ,
+                    where : {
+                        userId : req.user.id
+                    } ,
+                    attributes : ['isFinished'],
+                    required : true ,
+                }
+            ]
+        });
+
+        const excludedCourseIds = selectedCourses.map(course => course.id);
+
+        const unselectedCourses = await COURSES.findAll({
+            where: {
+                id: {
+                    [Sequelize.Op.notIn]: excludedCourseIds
+                }
+            },
+            attributes: [
+                'id',
+                'name',
+                'price',
+                [
+                    Sequelize.literal('FALSE'),
+                    'isSelected'
+                ] ,
+            ]
+        });
+
+        res.send(ApiResponse.success([...selectedCourses , ...unselectedCourses]));
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(ApiErrorResponse.InternalServerError());
+
+    }
+
+}
+
 export const getPendingRequests = async (req, res) => {
     try {
-        
+
         const result = await COURSE_STUDENT.findAll({
             raw: true,
-            where : {
-                isPaid : false
-            } ,
-             attributes : ['id'],
-            include : [
+            where: {
+                isPaid: false
+            },
+            attributes: ['id'],
+            include: [
                 {
-                    model : COURSES ,
-                    attributes: [ 'name' ],
-                } ,
+                    model: COURSES,
+                    attributes: ['name'],
+                },
                 {
-                    model : USERS ,
-                    attributes: [ 'name' ],
+                    model: USERS,
+                    attributes: ['name'],
                 }
             ]
         })
@@ -147,7 +203,7 @@ export const acceptRequest = async (req, res) => {
     try {
 
         const id = req.body.id;
-        
+
         const request = await COURSE_STUDENT.findByPk(id);
 
         if (!request)
@@ -167,15 +223,15 @@ export const acceptRequest = async (req, res) => {
 export const rejectRequest = async (req, res) => {
 
     try {
-        
+
         const id = req.body.id;
 
         const request = await COURSE_STUDENT.findByPk(id);
 
-        if(!request)
+        if (!request)
             return res.status(404).send(ApiErrorResponse.NotFound());
-        
-        if(request.isPaid)
+
+        if (request.isPaid)
             return res.status(400).send(ApiErrorResponse.BadRequest());
 
         await request.destroy();

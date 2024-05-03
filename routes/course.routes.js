@@ -7,6 +7,7 @@ const router = express.Router();
 router
     .get("/", courseController.getCourses)
     .get("/pending" , verifyAdmin , courseController.getPendingRequests)
+    .get("/courseswithstatus" , verifyUser , courseController.getCoursesWithSelectionStatus)
     .get("/:id", courseController.getCourse)
     .post("/accept" , verifyAdmin , courseController.acceptRequest)
     .post("/reject" , verifyAdmin , courseController.rejectRequest)

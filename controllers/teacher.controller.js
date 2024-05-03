@@ -48,7 +48,7 @@ export const login = async (req, res) => {
 
         if (!teacher)
             return res.status(404).send(ApiResponse.failure(null, "Invalid email or password"));
-
+        
         const compare = bcrypt.compareSync(password, teacher.password);
 
         if (!compare)
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
 
         delete teacher.dataValues.password;
 
-        const token = jwt.sign({ ...teacher.dataValues }, `${process.env.SECRET_JWT}`, {
+        const token = jwt.sign({ ...teacher.dataValues , profilePicture : teacher.profilePicture }, `${process.env.SECRET_JWT}`, {
             expiresIn: "24h",
         });
 
