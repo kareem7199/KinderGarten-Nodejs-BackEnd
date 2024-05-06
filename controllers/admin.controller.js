@@ -1,13 +1,14 @@
 import ApiErrorResponse from '../helpers/ApiErrorResponse.js';
 import ApiResponse from "../helpers/ApiResponse.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import ADMINS from "../models/admin.model.js";
+import AdminService from '../services/adminService.js'
+import AdminAuthService from '../services/AuthService/adminAuthService.js'
 
 export const getAdmins = async (req , res) => {
     try {
-        const admins = await ADMINS.findAll();
+        const admins = await AdminService.getAllAdmins();
+
         res.send(ApiResponse.success(admins));
+
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
@@ -16,7 +17,7 @@ export const getAdmins = async (req , res) => {
 export const getAdminById = async (req, res) => {
     try {
 
-        const admin = await ADMINS.findByPk(req.params.id);
+        const admin = await AdminService.getAdminById(req.params.id);
 
         if (!admin)
             return res.status(404).send(ApiErrorResponse.NotFound());
@@ -30,9 +31,8 @@ export const getAdminById = async (req, res) => {
 
 export const createAdmin = async (req, res) => {
     try {
-        req.body.password = await bcrypt.hashSync(req.body.password, 10);
 
-        const newAdmin = await ADMINS.create(req.body);
+        const newAdmin = await AdminService.createAdmin(req.body);
 
         if (!newAdmin)
             return res.status(404).send(ApiErrorResponse.BadRequest());
@@ -40,6 +40,7 @@ export const createAdmin = async (req, res) => {
         res.send(ApiResponse.created(newAdmin));
 
     } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
@@ -49,29 +50,15 @@ export const login =  async (req, res) => {
 
         const { password, email } = req.body;
 
-        const admin = await ADMINS.findOne({
-            where: {
-                email
-            }
-        })
+        const token = await AdminAuthService.login(email, password);
 
-        if (!admin)
+        if (!token)
             return res.status(404).send(ApiResponse.failure(null, "Invalid email or password"));
-
-        const compare = bcrypt.compareSync(password, admin.password);
-
-        if (!compare)
-            return res.status(404).send(ApiResponse.failure(null, "Invalid email or password"));
-
-        delete admin.dataValues.password;
-
-        const token = jwt.sign({ ...admin.dataValues }, `${process.env.SECRET_JWT}`, {
-            expiresIn: "24h",
-        });
 
         res.send(ApiResponse.success(token));
 
     } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
@@ -80,12 +67,11 @@ export const updateAdmin = async (req, res) => {
     try {
 
         const id = req.admin.id;
-        const admin = await ADMINS.findByPk(id);
 
-        if (!admin)
+        const updatedAdmin = await AdminService.updateAdmin(id , req.body);
+
+        if(!updatedAdmin)
             return res.status(404).send(ApiErrorResponse.NotFound());
-
-        const updatedAdmin = await admin.update(req.body);
 
         res.send(ApiResponse.success(updatedAdmin, "Admin updated successfully"));
 
@@ -97,12 +83,10 @@ export const updateAdmin = async (req, res) => {
 export const deleteAdminById = async (req, res) => {
     try {
 
-        const admin = await ADMINS.findByPk(req.params.id);
+        const admin = await AdminService.deleteAdmin(req.params.id);
 
-        if (!admin)
+        if(!admin)
             return res.status(404).send(ApiErrorResponse.NotFound());
-
-        await admin.destroy();
 
         res.send(ApiResponse.success(null, "Admin deleted successfully"));
 
