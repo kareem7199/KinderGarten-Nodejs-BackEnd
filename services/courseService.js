@@ -80,6 +80,26 @@ class CourseService {
 
         return courses;
     }
+
+    async getStudentCourseActivitiesForTeacher(courseStudentId , teacherId) {
+        
+        const courseStudent = await courseStudentRepo.getById(courseStudentId);
+
+        if(!courseStudent || !courseStudent.isPaid) return null;
+
+        const courseSpec = new CourseWithTeacherSpecifications([{teacherId} , {id : courseStudent.courseId}]).toQuery();
+        const course = await courseRepo.getWithSpec(courseSpec);
+        
+        if(!course) return null;
+
+        const courseStudentSpec = new CourseStudentSpecifications([{id : courseStudentId}]).toQuery();
+
+        const courseStudentDetails = await courseStudentRepo.getWithSpec(courseStudentSpec);
+
+        return courseStudentDetails;
+
+    }
+
     async getCourseByTeacherId(teacherId) {
 
         const spec = new CourseWithTeacherSpecifications([{ teacherId }]).toQuery();
