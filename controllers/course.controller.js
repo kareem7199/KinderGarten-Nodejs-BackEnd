@@ -65,6 +65,18 @@ export const getPendingRequests = async (req, res) => {
     }
 }
 
+export const getTeacherCourses = async (req, res) => {
+    try {
+        
+        const courses = await CourseService.getTeacherCourses(req.teacher.id);
+
+        res.send(ApiResponse.success(courses));
+
+    } catch (error) {
+        res.status(500).send(ApiErrorResponse.InternalServerError());
+    }
+}
+
 export const addActivityToStudent = async (req, res) => {
     try {
 

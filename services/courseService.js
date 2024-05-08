@@ -4,6 +4,7 @@ import CourseStudent from "../models/courseStudent.model.js"
 import CourseWithTeacherSpecifications from "../specifications/courseSpecifications/CourseWithTeacherSpecifications.js"
 import CourseStudentSpecifications from "../specifications/courseStudentSpecifications/CourseStudentSpecifications.js"
 import CourseWithStudentCourseSpecifications from '../specifications/courseSpecifications/CourseWithStudentCourseSpecifications.js'
+import BaseSpecification from "../specifications/BaseSpecifications.js"
 
 import Actvity from '../models/activity.model.js'
 
@@ -54,6 +55,13 @@ class CourseService {
         return result;
     }
 
+    async getTeacherCourses(id) {
+        const spec = new BaseSpecification([{teacherId : id}]).toQuery();
+
+        const courses = await courseRepo.getAllWithSpec(spec);
+
+        return courses;
+    }
     async getCourseByTeacherId(teacherId) {
 
         const spec = new CourseWithTeacherSpecifications([{ teacherId }]).toQuery();

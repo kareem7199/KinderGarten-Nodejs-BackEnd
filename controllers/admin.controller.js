@@ -41,7 +41,6 @@ export const createAdmin = async (req, res) => {
         res.send(ApiResponse.created(newAdmin));
 
     } catch (error) {
-        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
@@ -59,7 +58,6 @@ export const login =  async (req, res) => {
         res.send(ApiResponse.success(token));
 
     } catch (error) {
-        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
