@@ -55,6 +55,24 @@ class CourseService {
         return result;
     }
 
+    async getCourseStudents(courseId , teacherId) {
+        
+
+        const courseSpec = new CourseWithTeacherSpecifications([{teacherId} , {id : courseId}]).toQuery();
+
+        const course = await courseRepo.getWithSpec(courseSpec);
+
+        console.log(course)
+
+        if(!course) return null;
+
+        const courseStudentSpec = new CourseStudentSpecifications([{courseId} , {isPaid : true}]).toQuery();
+
+        const courseStudents = await courseStudentRepo.getAllWithSpec(courseStudentSpec);
+
+        return courseStudents;
+    }
+
     async getTeacherCourses(id) {
         const spec = new BaseSpecification([{teacherId : id}]).toQuery();
 

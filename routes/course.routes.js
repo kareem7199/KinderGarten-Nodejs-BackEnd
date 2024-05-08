@@ -9,6 +9,7 @@ router
     .get("/pending" , verifyAdmin , courseController.getPendingRequests)
     .get("/courseswithstatus" , verifyUser , courseController.getCoursesWithSelectionStatus)
     .get("/teachercourses" , verifyTeacher , courseController.getTeacherCourses)
+    .get("/getcoursestudents/:id" , verifyTeacher , courseController.getCourseStudents)
     .get("/:id", courseController.getCourse)
     .post("/accept" , verifyAdmin , courseController.acceptRequest)
     .post("/reject" , verifyAdmin , courseController.rejectRequest)

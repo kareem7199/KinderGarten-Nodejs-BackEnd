@@ -6,6 +6,7 @@ import CourseService from '../services/courseService.js'
 import CourseDto from '../dtos/course/CourseDto.js'
 import CourseWithStatusDto from '../dtos/course/CourseWithStatusDto.js'
 import PendingRequestsDto from "../dtos/courseStudent/pendingRequestsDto.js"
+import CourseStudentDto from "../dtos/courseStudent/CourseStudentDto.js"
 
 export const getCourses = async (req, res) => {
     try {
@@ -73,6 +74,21 @@ export const getTeacherCourses = async (req, res) => {
         res.send(ApiResponse.success(courses));
 
     } catch (error) {
+        res.status(500).send(ApiErrorResponse.InternalServerError());
+    }
+}
+
+export const getCourseStudents = async (req, res) => {
+    try {
+        
+        const students = await CourseService.getCourseStudents(req.params.id , req.teacher.id);
+
+        if(!students) return res.send(ApiErrorResponse.NotFound());
+
+        res.send(ApiResponse.success(new CourseStudentDto(students).map()))
+
+    } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
