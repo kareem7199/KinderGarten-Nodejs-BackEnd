@@ -15,23 +15,27 @@ class BaseRepository {
         return await this.model.findOne(spec);
     }
 
+    async getAllWithSpec(spec) {
+        return await this.model.findAll(spec);
+    }
+
     async create(data) {
         return await this.model.create(data);
     }
 
     async update(id, data) {
         const instance = await this.getById(id);
-        if (!instance) {
-            throw new Error(`${this.model.name} not found`);
-        }
+        if (!instance) 
+            return null;
         return await instance.update(data);
     }
 
     async delete(id) {
         const instance = await this.getById(id);
-        if (!instance) {
-            throw new Error(`${this.model.name} not found`);
-        }
+
+        if (!instance) 
+            return null;
+        
         return await instance.destroy();
     }
 }

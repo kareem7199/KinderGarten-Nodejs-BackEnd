@@ -2,18 +2,15 @@ import { ACTIVITIES, TEACHERS, COURSES, COURSE_STUDENT, USERS } from "../models/
 import ApiErrorResponse from '../helpers/ApiErrorResponse.js'
 import ApiResponse from "../helpers/ApiResponse.js"
 import { Sequelize } from "sequelize"
+import CourseService from '../services/courseService.js';
 
 export const getCourses = async (req, res) => {
     try {
-        const cousrses = await COURSES.findAll({
-            attributes: ["id", "name", "price"],
-            raw: true,
-            include: {
-                attributes: ["name"],
-                model: TEACHERS
-            }
-        });
-        res.send(ApiResponse.success(cousrses));
+
+        const courses = await CourseService.getCoursesWithTeachers();
+
+        res.send(ApiResponse.success(courses));
+
     } catch (error) {
         console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
@@ -22,17 +19,7 @@ export const getCourses = async (req, res) => {
 
 export const getCourse = async (req, res) => {
     try {
-
-        const course = await COURSES.findOne({
-            raw: true,
-            where: {
-                id: req.params.id
-            },
-            include: {
-                model: TEACHERS,
-                attributes: ["name", "profilePicture"]
-            }
-        });
+        const course = await CourseService.getCourseWithTeacher(req.params.id);
 
 
         if (!course)
@@ -103,30 +90,12 @@ export const getCoursesWithSelectionStatus = async (req, res) => {
 
 export const getPendingRequests = async (req, res) => {
     try {
-
-        const result = await COURSE_STUDENT.findAll({
-            raw: true,
-            where: {
-                isPaid: false
-            },
-            attributes: ['id'],
-            include: [
-                {
-                    model: COURSES,
-                    attributes: ['name'],
-                },
-                {
-                    model: USERS,
-                    attributes: ['name'],
-                }
-            ]
-        })
+        
+        const result = await CourseService.getPendingRequests();
 
         res.send(ApiResponse.success(result));
 
     } catch (error) {
-
-        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
@@ -138,31 +107,26 @@ export const addActivityToStudent = async (req, res) => {
         const coursestudentId = req.params.id;
         const { grade, title, fullMark } = req.body;
 
-        const courseStudent = await COURSE_STUDENT.findByPk(coursestudentId);
+        const courseStudent = await CourseService.getCourseStudent(coursestudentId);
 
         if (!courseStudent.isPaid)
             return res.status(400).send(ApiErrorResponse.BadRequest());
 
-        const course = await COURSES.findOne({
-            where: {
-                teacherId: teacherId
-            }
-        })
+        const course = await CourseService.getCourseByTeacherId(teacherId)
 
         if (!course)
             return res.status(400).send(ApiErrorResponse.BadRequest());
 
-        const newActivity = await ACTIVITIES.create({
+        const newActivity = await CourseService.createActivity({
             title,
             grade,
             fullMark,
             coursestudentId: coursestudentId
-        })
+        });
 
         res.send(ApiResponse.created(newActivity));
 
     } catch (error) {
-        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
@@ -170,7 +134,7 @@ export const addActivityToStudent = async (req, res) => {
 export const enroll = async (req, res) => {
     try {
 
-        const newCourseStudent = await COURSE_STUDENT.create({
+        const newCourseStudent = await CourseService.enroll({
             courseId: req.body.courseId,
             userId: req.user.id
         });
@@ -185,8 +149,7 @@ export const enroll = async (req, res) => {
 
 export const createCourse = async (req, res) => {
     try {
-
-        const newCourse = await COURSES.create(req.body);
+        const newCourse = await CourseService.createCourse(req.body);
 
         if (!newCourse)
             return res.status(404).send(ApiErrorResponse.BadRequest());
@@ -204,14 +167,10 @@ export const acceptRequest = async (req, res) => {
 
         const id = req.body.id;
 
-        const request = await COURSE_STUDENT.findByPk(id);
+        const request = await CourseService.acceptRequest(id);
 
         if (!request)
             return res.status(404).send(ApiErrorResponse.NotFound());
-
-        request.isPaid = true;
-
-        await request.save();
 
         res.send(ApiResponse.success(request, "request Accepted successfully"));
 
@@ -226,19 +185,15 @@ export const rejectRequest = async (req, res) => {
 
         const id = req.body.id;
 
-        const request = await COURSE_STUDENT.findByPk(id);
+        const request = await CourseService.rejectRequest(id);
 
         if (!request)
             return res.status(404).send(ApiErrorResponse.NotFound());
 
-        if (request.isPaid)
-            return res.status(400).send(ApiErrorResponse.BadRequest());
-
-        await request.destroy();
-
         res.send(ApiResponse.success(request, "request Rejected successfully"));
 
     } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 
@@ -247,16 +202,15 @@ export const rejectRequest = async (req, res) => {
 export const updateCourse = async (req, res) => {
     try {
 
-        const course = await COURSES.findByPk(req.params.id);
+        const course = await CourseService.updateCourse(req.params.id , req.body);
 
         if (!course)
             return res.status(404).send(ApiErrorResponse.NotFound());
 
-        const updatedCourse = await course.update(req.body);
-
-        res.send(ApiResponse.success(updatedCourse, "Course updated successfully"));
+        res.send(ApiResponse.success(course, "Course updated successfully"));
 
     } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
@@ -264,14 +218,12 @@ export const updateCourse = async (req, res) => {
 export const deleteCourseById = async (req, res) => {
     try {
 
-        const course = await COURSES.findByPk(req.params.id);
+        const course = await CourseService.deleteCourseById(req.params.id);
 
         if (!course)
             return res.status(404).send(ApiErrorResponse.NotFound());
 
-        await course.destroy();
-
-        res.send(ApiResponse.success(null, "Course deleted successfully"));
+        res.send(ApiResponse.success(course, "Course deleted successfully"));
 
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError());
