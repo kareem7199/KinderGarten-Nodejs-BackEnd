@@ -6,9 +6,12 @@ class TeacherWithCourseDto {
 
     map() {
             
+        if(this.data) {
+            
             const result = this.data.name
 
             return result;
+        }
     }
 }
 

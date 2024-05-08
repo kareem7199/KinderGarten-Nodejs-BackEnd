@@ -15,7 +15,7 @@ class TeacherService {
 
     async getTeacher(id) {
         
-        const spec = new TeacherWithCoursesSpecifications({id}).toQuery();
+        const spec = new TeacherWithCoursesSpecifications([{id}]).toQuery();
 
         const teacher = await teacherRepo.getWithSpec(spec);
 
