@@ -1,4 +1,4 @@
-import { ACTIVITIES, TEACHERS, COURSES, COURSE_STUDENT, USERS } from "../models/index.models.js"
+import { COURSES, COURSE_STUDENT } from "../models/index.models.js"
 import ApiErrorResponse from '../helpers/ApiErrorResponse.js'
 import ApiResponse from "../helpers/ApiResponse.js"
 import { Sequelize } from "sequelize"

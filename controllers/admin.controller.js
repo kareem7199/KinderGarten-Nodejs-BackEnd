@@ -2,12 +2,13 @@ import ApiErrorResponse from '../helpers/ApiErrorResponse.js';
 import ApiResponse from "../helpers/ApiResponse.js";
 import AdminService from '../services/adminService.js'
 import AdminAuthService from '../services/AuthService/adminAuthService.js'
+import AdminDto from '../dtos/admin/AdminDto.js';
 
 export const getAdmins = async (req , res) => {
     try {
         const admins = await AdminService.getAllAdmins();
 
-        res.send(ApiResponse.success(admins));
+        res.send(ApiResponse.success(new AdminDto(admins).map()));
 
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError());
@@ -22,7 +23,7 @@ export const getAdminById = async (req, res) => {
         if (!admin)
             return res.status(404).send(ApiErrorResponse.NotFound());
 
-        res.send(ApiResponse.success(admin));
+        res.send(ApiResponse.success(new AdminDto(admin).map()));
 
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError(500));
@@ -73,7 +74,7 @@ export const updateAdmin = async (req, res) => {
         if(!updatedAdmin)
             return res.status(404).send(ApiErrorResponse.NotFound());
 
-        res.send(ApiResponse.success(updatedAdmin, "Admin updated successfully"));
+        res.send(ApiResponse.success(new AdminDto(updatedAdmin).map(), "Admin updated successfully"));
 
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError());

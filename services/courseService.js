@@ -89,11 +89,7 @@ class CourseService {
     }
 
     async deleteCourseById(id) {
-        const course = await courseRepo.delete(id);
-
-        if(!course) return null;
-
-        return course;
+        const course = await courseRepo.delete()
     }
 
 }

@@ -29,10 +29,6 @@ export default db.define("users", {
     profilePicture: {
         type: DataTypes.STRING(255),
         allowNull: false ,
-        get() {
-            const rawValue = this.getDataValue('profilePicture');
-            return rawValue ? `${process.env.BASEURL}/uploads/users/${rawValue}` : null;
-          }
     },
     createdAt: {
         type: DataTypes.DATEONLY,
