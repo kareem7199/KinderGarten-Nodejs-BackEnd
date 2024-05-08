@@ -3,6 +3,8 @@ import Course from "../models/course.model.js"
 import CourseStudent from "../models/courseStudent.model.js"
 import CourseWithTeacherSpecifications from "../specifications/courseSpecifications/CourseWithTeacherSpecifications.js"
 import CourseStudentSpecifications from "../specifications/courseStudentSpecifications/CourseStudentSpecifications.js"
+import CourseWithStudentCourseSpecifications from '../specifications/courseSpecifications/CourseWithStudentCourseSpecifications.js'
+
 import Actvity from '../models/activity.model.js'
 
 const courseRepo = new BaseRepository(Course);
@@ -28,6 +30,15 @@ class CourseService {
         return course;
     }
 
+    async getCoursesWithStudentCourseByUserId(id) {
+
+        const spec = new CourseWithStudentCourseSpecifications(id).toQuery();
+
+        const courses = await courseRepo.getAllWithSpec(spec);
+
+        return courses;
+
+    }
     async getPendingRequests() {
 
         const spec = new CourseStudentSpecifications([{ isPaid: false }]).toQuery();

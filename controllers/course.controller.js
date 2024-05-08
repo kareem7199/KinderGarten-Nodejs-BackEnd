@@ -2,14 +2,17 @@ import { COURSES, COURSE_STUDENT } from "../models/index.models.js"
 import ApiErrorResponse from '../helpers/ApiErrorResponse.js'
 import ApiResponse from "../helpers/ApiResponse.js"
 import { Sequelize } from "sequelize"
-import CourseService from '../services/courseService.js';
+import CourseService from '../services/courseService.js'
+import CourseDto from '../dtos/course/CourseDto.js'
+import CourseWithStatusDto from '../dtos/course/CourseWithStatusDto.js'
+import PendingRequestsDto from "../dtos/courseStudent/pendingRequestsDto.js"
 
 export const getCourses = async (req, res) => {
     try {
 
         const courses = await CourseService.getCoursesWithTeachers();
 
-        res.send(ApiResponse.success(courses));
+        res.send(ApiResponse.success(new CourseDto(courses).map()));
 
     } catch (error) {
         console.log(error)
@@ -25,9 +28,10 @@ export const getCourse = async (req, res) => {
         if (!course)
             return res.status(404).send(ApiErrorResponse.NotFound());
 
-        res.send(ApiResponse.success(course));
+        res.send(ApiResponse.success(new CourseDto(course).map()));
 
     } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError(500));
     }
 }
@@ -36,49 +40,9 @@ export const getCoursesWithSelectionStatus = async (req, res) => {
 
     try {
 
-        const selectedCourses = await COURSES.findAll({
-            attributes: [
-                'id',
-                'name',
-                'price',
-                [
-                    Sequelize.literal('TRUE'),
-                    'isSelected'
-                ] ,
-            ], 
-            raw : true ,
-            include: [
-                {
-                    model: COURSE_STUDENT ,
-                    where : {
-                        userId : req.user.id
-                    } ,
-                    attributes : ['isFinished'],
-                    required : true ,
-                }
-            ]
-        });
-
-        const excludedCourseIds = selectedCourses.map(course => course.id);
-
-        const unselectedCourses = await COURSES.findAll({
-            where: {
-                id: {
-                    [Sequelize.Op.notIn]: excludedCourseIds
-                }
-            },
-            attributes: [
-                'id',
-                'name',
-                'price',
-                [
-                    Sequelize.literal('FALSE'),
-                    'isSelected'
-                ] ,
-            ]
-        });
-
-        res.send(ApiResponse.success([...selectedCourses , ...unselectedCourses]));
+        const courses = await CourseService.getCoursesWithStudentCourseByUserId(req.user.id);
+        
+        res.send(ApiResponse.success(new CourseWithStatusDto(courses).map()));
 
     } catch (error) {
         console.log(error)
@@ -93,9 +57,10 @@ export const getPendingRequests = async (req, res) => {
         
         const result = await CourseService.getPendingRequests();
 
-        res.send(ApiResponse.success(result));
+        res.send(ApiResponse.success(new PendingRequestsDto(result).map()));
 
     } catch (error) {
+        console.log(error)
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }

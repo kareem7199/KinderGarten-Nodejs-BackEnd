@@ -4,7 +4,6 @@ class BaseSpecification {
         
         this.criteria = [];
         this.includes = [];
-        this.isRaw = false;
 
         if(criteria?.length > 0) {
 
@@ -48,12 +47,6 @@ class BaseSpecification {
             })
 
         }
-
-        if(this.isRaw)
-            Object.defineProperty(query, 'raw', {
-                enumerable : true ,
-                value: true
-            })
 
         return query;
     }

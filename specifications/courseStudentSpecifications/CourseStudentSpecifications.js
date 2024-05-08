@@ -7,8 +7,7 @@ class CourseStudentSpecifications extends BaseSpecification{
     constructor(criteria) {
 
         super(criteria);
-
-        this.isRaw = true;
+        
         this.addInclude({model : Course});
         this.addInclude({model : Student});
         

@@ -6,8 +6,6 @@ class CourseWithTeacherSpecifications extends BaseSpecifications {
         
         super(criteria);
 
-        this.isRaw = true;
-
         this.addInclude({ model: Teacher })
     }
 }
