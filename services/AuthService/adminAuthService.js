@@ -1,11 +1,11 @@
-import adminRepository from "../../repositories/adminRepository.js";
+import AdminService from '../adminService.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 class AdminAuthService {
-    static async login(email, password) {
+    async login(email, password) {
         
-        const admin = await adminRepository.getByEmail(email);
+        const admin = await AdminService.getAdminByEmail(email);
 
         if (!admin || !bcrypt.compareSync(password, admin.password)) {
             return null;
@@ -21,4 +21,4 @@ class AdminAuthService {
     }
 }
 
-export default AdminAuthService;
+export default new AdminAuthService();

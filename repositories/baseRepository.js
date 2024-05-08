@@ -11,6 +11,10 @@ class BaseRepository {
         return await this.model.findByPk(id);
     }
 
+    async getWithSpec(spec) {
+        return await this.model.findOne(spec);
+    }
+
     async create(data) {
         return await this.model.create(data);
     }

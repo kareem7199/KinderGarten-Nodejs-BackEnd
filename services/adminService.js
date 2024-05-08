@@ -1,27 +1,35 @@
-// services/categoryService.js
-import AdminRepository from "../repositories/adminRepository.js";
+import BaseRepository from "../repositories/baseRepository.js"
+import AdminSpecifications from "../specifications/adminSpecifications/adminSpecifications.js"
 import bcrypt from "bcryptjs";
+import Admin from "../models/admin.model.js";
+
+const AdminRepository = new BaseRepository(Admin);
 
 class AdminService {
 
-    static async getAllAdmins() {
+    async getAllAdmins() {
         return await AdminRepository.getAll();
     }
 
-    static async getAdminById(id) {
+    async getAdminById(id) {
         return await AdminRepository.getById(id);
     }
 
-    static async getAdminByEmail(email) {
-        return await AdminRepository.getByEmail(email);
+    async getAdminByEmail(email) {
+        
+        const spec = new AdminSpecifications(email).toQuery();
+
+        return await AdminRepository.getWithSpec(spec);
     }
 
-    static async createAdmin(data) {
-        data.password = await bcrypt.hashSync(data.password, 10);
+    async createAdmin(data) {
+
+        data.password =  bcrypt.hashSync(data.password, 10);
+
         return await AdminRepository.create(data);
     }
 
-    static async updateAdmin(id, data) {
+    async updateAdmin(id, data) {
 
         const admin = await AdminRepository.getById(id);
 
@@ -31,7 +39,7 @@ class AdminService {
         return await AdminRepository.update(id, data);
     }
 
-    static async deleteAdmin(id) {
+    async deleteAdmin(id) {
 
         const admin = await AdminRepository.getById(id);
 
@@ -42,4 +50,4 @@ class AdminService {
     }
 }
 
-export default AdminService;
+export default new AdminService();
