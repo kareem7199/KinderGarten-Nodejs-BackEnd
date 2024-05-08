@@ -1,4 +1,5 @@
 import UserDto from "../user/UserDto.js";
+import ActivityDto from "../activity/ActivityDto.js";
 
 class CourseStudentActivityDto {
 
@@ -13,7 +14,7 @@ class CourseStudentActivityDto {
                 return {
                     ...new UserDto(e.user).map() ,
                     courseName : e.course.name ,
-                    activities : e.activities
+                    activities : new ActivityDto(e.activities).map()
                 }
             })
 
@@ -24,7 +25,7 @@ class CourseStudentActivityDto {
             const result = {
                 ...new UserDto(this.data.user).map() ,
                 courseName : this.data.course.name ,
-                activities : this.data.activities
+                activities : new ActivityDto(this.data.activities).map()
             }
 
             return result;
