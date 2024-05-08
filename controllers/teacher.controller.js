@@ -5,7 +5,7 @@ import ApiErrorResponse from '../helpers/ApiErrorResponse.js'
 import ApiResponse from "../helpers/ApiResponse.js"
 import TeacherService from '../services/teacherService.js'
 import TeacherDto from "../dtos/teacher/TeacherDto.js"
-
+import TeacherAuthService from "../services/AuthService/teacherAuthService.js"
 export const getTeachers = async (req, res) => {
     try {
         const teachers = await TeacherService.getAllTeachers();
@@ -36,28 +36,12 @@ export const getTeacher = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-
         const { password, email } = req.body;
 
-        const teacher = await TEACHERS.findOne({
-            where: {
-                email
-            }
-        })
+        const token = await TeacherAuthService.login(email, password);
 
-        if (!teacher)
+        if (!token)
             return res.status(404).send(ApiResponse.failure(null, "Invalid email or password"));
-        
-        const compare = bcrypt.compareSync(password, teacher.password);
-
-        if (!compare)
-            return res.status(404).send(ApiResponse.failure(null, "Invalid email or password"));
-
-        delete teacher.dataValues.password;
-
-        const token = jwt.sign({ ...teacher.dataValues , profilePicture : teacher.profilePicture }, `${process.env.SECRET_JWT}`, {
-            expiresIn: "24h",
-        });
 
         res.send(ApiResponse.success(token));
 

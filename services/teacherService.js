@@ -24,6 +24,16 @@ class TeacherService {
         return teacher;
     }
 
+    async getTeacherByEmail(email) {
+        const spec = new TeacherWithCoursesSpecifications([{email}]).toQuery();
+
+        const teacher = await teacherRepo.getWithSpec(spec);
+
+        if(!teacher) return null;
+
+        return teacher;
+    }
+
     async createTeacher(data) {
 
         data.password = bcrypt.hashSync(data.password, 10);
