@@ -30,10 +30,6 @@ export default db.define("teachers", {
     profilePicture: {
         type: DataTypes.STRING(255),
         allowNull: false,
-        get() {
-            const rawValue = this.getDataValue('profilePicture');
-            return rawValue ? `${process.env.BASEURL}/uploads/teachers/${rawValue}` : null;
-          }
     },
     password: {
         type: DataTypes.STRING(255),
