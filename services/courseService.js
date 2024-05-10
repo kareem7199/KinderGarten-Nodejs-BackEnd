@@ -146,7 +146,8 @@ class CourseService {
     }
 
     async deleteCourseById(id) {
-        const course = await courseRepo.delete()
+        const course = await courseRepo.delete(id);
+        return course;
     }
 
 }
