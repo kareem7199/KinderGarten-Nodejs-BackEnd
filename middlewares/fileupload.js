@@ -155,7 +155,7 @@ export const multiFiles = (keysHandler) => {
 };
 export const uploadUserProfilePicture = () => {
   return (req, res, next) => {
-    const file = userProfilePictureUploader.single("image");
+    const file = userProfilePictureUploader.single("ض");
 
     file(req, res, function (err) {
       if (err instanceof multer.MulterError) {

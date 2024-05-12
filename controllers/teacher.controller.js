@@ -71,7 +71,7 @@ export const updateTeacher = async (req, res) => {
 
         const id = req.teacher.id;
 
-        const teacher = await TeacherService.updateTeacher(id , req.body);
+        const teacher = await TeacherService.updateTeacher(id, req.body);
 
         if (!teacher)
             return res.status(404).send(ApiErrorResponse.NotFound());
@@ -98,4 +98,19 @@ export const deleteTeacherById = async (req, res) => {
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
+}
+
+export const addStatus = async (req, res) => {
+
+    try {
+        const status = await TeacherService.addStatus(req.params.id, req.body.title);
+
+        if (!status)
+            return res.status(404).send(ApiErrorResponse.BadRequest());
+
+        res.send(ApiResponse.created(status));
+    } catch (error) {
+        res.status(500).send(ApiErrorResponse.InternalServerError());
+    }
+
 }

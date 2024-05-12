@@ -10,6 +10,7 @@ router
     .get("/:id", verifyAdmin, teacherController.getTeacher)
     .post("/", verifyAdmin, uploadTeacherProfilePicture(), teacherController.createTeacher)
     .post("/login", teacherController.login)
+    .post("/addstatus/:id" , verifyTeacher , teacherController.addStatus)
     .put("/", verifyTeacher, teacherController.updateTeacher)
     .delete("/:id", verifyAdmin,teacherController.deleteTeacherById)
 

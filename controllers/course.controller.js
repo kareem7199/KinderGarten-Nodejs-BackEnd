@@ -5,7 +5,7 @@ import { Sequelize } from "sequelize"
 import CourseService from '../services/courseService.js'
 import CourseDto from '../dtos/course/CourseDto.js'
 import CourseWithStatusDto from '../dtos/course/CourseWithStatusDto.js'
-import PendingRequestsDto from "../dtos/courseStudent/pendingRequestsDto.js"
+import PendingRequestsDto from "../dtos/courseStudent/PendingRequestsDto.js"
 import CourseStudentDto from "../dtos/courseStudent/CourseStudentDto.js"
 import CourseStudentActivityDto from "../dtos/courseStudent/CourseStudentActivityDto.js"
 export const getCourses = async (req, res) => {

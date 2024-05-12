@@ -3,8 +3,11 @@ import User from '../models/user.model.js'
 import moment from 'moment';
 import bcrypt from "bcryptjs";
 import BaseSpecification from '../specifications/BaseSpecifications.js';
+import Status from '../models/status.model.js'
+import { DATEONLY, where } from 'sequelize';
 
 const userRepo = new BaseRepository(User);
+const statusRepo = new BaseRepository(Status);
 
 class UserService {
 
@@ -22,13 +25,35 @@ class UserService {
 
     async getUserByParentPhone(phone) {
 
-        const spec = new BaseSpecification([{parentPhone : phone}]).toQuery();
+        const spec = new BaseSpecification([{ parentPhone: phone }]).toQuery();
 
         const user = await userRepo.getWithSpec(spec);
 
-        if(!user) return null;
+        if (!user) return null;
 
         return user;
+    }
+
+    async getStatus(id) {
+
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+
+        const formattedDate = `${year}-${month}-${day}`;
+        
+        console.log(formattedDate);
+
+        const status = await statusRepo.getAllWithSpec({
+            where: {
+                userId: id,
+                createdAt : formattedDate
+            }
+        })
+
+        return status;
     }
 
     async createUser(data) {

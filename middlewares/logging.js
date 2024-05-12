@@ -1,5 +1,5 @@
-const morgan = require("morgan");
-const fs = require("fs");
+import morgan from "morgan";
+import fs from "fs";
 
 var accessLogStream = fs.createWriteStream("access.log", { flags: "a" });
 morgan.token("req-body", (req, res) => {

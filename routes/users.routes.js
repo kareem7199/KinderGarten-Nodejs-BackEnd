@@ -7,8 +7,9 @@ const router = express.Router();
 
 router
     .get("/", verifyAdmin, userController.getUsers)
-    .get("/:id", userController.getUser)
-    .post("/", verifyAdmin, uploadUserProfilePicture(), userController.createUser)
+    .get("/info" , verifyUser , userController.getUser)
+    .get("/status" , verifyUser , userController.getStatus)
+    .post("/", uploadUserProfilePicture(), userController.createUser)
     .post("/login", userController.login)
     .put("/", verifyUser, userController.updateUser)
     .delete("/:id", verifyAdmin, userController.deleteUserById)

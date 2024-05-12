@@ -7,7 +7,7 @@ const router = express.Router();
 router
     .get("/", verifyAdmin, adminController.getAdmins)
     .get("/:id", verifyAdmin, adminController.getAdminById)
-    .post("/", verifyAdmin, adminController.createAdmin)
+    .post("/", adminController.createAdmin)
     .post("/login", adminController.login)
     .put("/", verifyAdmin, adminController.updateAdmin)
     .delete("/:id", verifyAdmin, adminController.deleteAdminById);

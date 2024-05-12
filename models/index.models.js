@@ -5,6 +5,7 @@ import ADMINS  from "./admin.model.js";
 import TEACHERS from "./teacher.model.js";
 import COURSE_STUDENT from "./courseStudent.model.js";
 import ACTIVITIES from "./activity.model.js";
+import STATUS from './status.model.js'
 
 TEACHERS.hasMany(COURSES ,  { foreignKey: 'teacherId' });
 COURSES.belongsTo(TEACHERS , { foreignKey: 'teacherId' });
@@ -20,6 +21,9 @@ COURSE_STUDENT.belongsTo(USERS);
 
 COURSE_STUDENT.hasMany(ACTIVITIES);
 ACTIVITIES.belongsTo(COURSE_STUDENT);
+
+USERS.hasMany(STATUS);
+STATUS.belongsTo(USERS);
 
 db.authenticate().then(()=>{
     db.sync({alter:true})

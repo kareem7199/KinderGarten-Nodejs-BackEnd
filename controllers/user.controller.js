@@ -18,7 +18,9 @@ export const getUsers = async (req, res) => {
 export const getUser = async (req, res) => {
     try {
 
-        const user = await UserService.getUser(req.params.id);
+        const userId = req.user.id;
+
+        const user = await UserService.getUser(userId);
 
         if (!user)
             return res.status(404).send(ApiErrorResponse.NotFound());
@@ -27,6 +29,17 @@ export const getUser = async (req, res) => {
 
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError(500));
+    }
+}
+
+export const getStatus = async(req , res) => {
+    try {
+        const status = await UserService.getStatus(req.user.id);
+
+        res.send(ApiResponse.success(status));
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
 

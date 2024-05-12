@@ -1,8 +1,10 @@
 import BaseRepository from "../repositories/baseRepository.js"
 import Teacher from '../models/teacher.model.js'
+import Status from '../models/status.model.js'
 import TeacherWithCoursesSpecifications from '../specifications/teacherSpecifications/TeacherWithCoursesSpecifications.js'
 import bcrypt from "bcryptjs";
 const teacherRepo = new BaseRepository(Teacher);
+const statusRepo = new BaseRepository(Status);
 
 class TeacherService {
 
@@ -60,6 +62,15 @@ class TeacherService {
         if(!teacher) return null;
 
         return await teacherRepo.delete(id);
+    }
+
+    async addStatus(id , title){
+        const status = statusRepo.create({
+            title ,
+            userId : id
+        })
+
+        return status;
     }
 }
 
