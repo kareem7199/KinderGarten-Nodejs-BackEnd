@@ -3,6 +3,8 @@ import ApiResponse from "../helpers/ApiResponse.js";
 import AdminService from '../services/adminService.js'
 import AdminAuthService from '../services/AuthService/adminAuthService.js'
 import AdminDto from '../dtos/admin/AdminDto.js';
+import CourseService from '../services/courseService.js';
+import UserService from '../services/userService.js';
 
 export const getAdmins = async (req , res) => {
     try {
@@ -27,6 +29,26 @@ export const getAdminById = async (req, res) => {
 
     } catch (error) {
         res.status(500).send(ApiErrorResponse.InternalServerError(500));
+    }
+}
+
+export const getStats = async (req , res) => {
+    try {
+        const totalPrices = await CourseService.getTotalPriceOfCourses();
+        const totalPriceOfPendingRequests = await CourseService.getTotalPriceOfPendingRequests();
+        const userCount = await UserService.getUserCount();
+        const numberOfStudentsPerCourse = await CourseService.getNumberOfStudentsPerCourse();
+
+        res.send(ApiResponse.success({
+            totalPrices ,
+            totalPriceOfPendingRequests,
+            userCount ,
+            numberOfStudentsPerCourse
+        }));
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
 

@@ -5,7 +5,7 @@ import CourseWithTeacherSpecifications from "../specifications/courseSpecificati
 import CourseStudentSpecifications from "../specifications/courseStudentSpecifications/CourseStudentSpecifications.js"
 import CourseWithStudentCourseSpecifications from '../specifications/courseSpecifications/CourseWithStudentCourseSpecifications.js'
 import BaseSpecification from "../specifications/BaseSpecifications.js"
-
+import { Sequelize, where } from "sequelize"
 import Actvity from '../models/activity.model.js'
 
 const courseRepo = new BaseRepository(Course);
@@ -55,18 +55,18 @@ class CourseService {
         return result;
     }
 
-    async getCourseStudents(courseId , teacherId) {
-        
+    async getCourseStudents(courseId, teacherId) {
 
-        const courseSpec = new CourseWithTeacherSpecifications([{teacherId} , {id : courseId}]).toQuery();
+
+        const courseSpec = new CourseWithTeacherSpecifications([{ teacherId }, { id: courseId }]).toQuery();
 
         const course = await courseRepo.getWithSpec(courseSpec);
 
         console.log(course)
 
-        if(!course) return null;
+        if (!course) return null;
 
-        const courseStudentSpec = new CourseStudentSpecifications([{courseId} , {isPaid : true}]).toQuery();
+        const courseStudentSpec = new CourseStudentSpecifications([{ courseId }, { isPaid: true }]).toQuery();
 
         const courseStudents = await courseStudentRepo.getAllWithSpec(courseStudentSpec);
 
@@ -74,30 +74,85 @@ class CourseService {
     }
 
     async getTeacherCourses(id) {
-        const spec = new BaseSpecification([{teacherId : id}]).toQuery();
+        const spec = new BaseSpecification([{ teacherId: id }]).toQuery();
 
         const courses = await courseRepo.getAllWithSpec(spec);
 
         return courses;
     }
 
-    async getStudentCourseActivitiesForTeacher(courseStudentId , teacherId) {
-        
+    async getStudentCourseActivitiesForTeacher(courseStudentId, teacherId) {
+
         const courseStudent = await courseStudentRepo.getById(courseStudentId);
 
-        if(!courseStudent || !courseStudent.isPaid) return null;
+        if (!courseStudent || !courseStudent.isPaid) return null;
 
-        const courseSpec = new CourseWithTeacherSpecifications([{teacherId} , {id : courseStudent.courseId}]).toQuery();
+        const courseSpec = new CourseWithTeacherSpecifications([{ teacherId }, { id: courseStudent.courseId }]).toQuery();
         const course = await courseRepo.getWithSpec(courseSpec);
-        
-        if(!course) return null;
 
-        const courseStudentSpec = new CourseStudentSpecifications([{id : courseStudentId}]).toQuery();
+        if (!course) return null;
+
+        const courseStudentSpec = new CourseStudentSpecifications([{ id: courseStudentId }]).toQuery();
 
         const courseStudentDetails = await courseStudentRepo.getWithSpec(courseStudentSpec);
 
         return courseStudentDetails;
 
+    }
+
+    async getTotalPriceOfCourses() {
+        // Perform a join operation to get the total price based on student enrollment
+        const totalPrice = await courseStudentRepo.getAllWithSpec({
+            attributes: [[Sequelize.fn('SUM', Sequelize.col('price')), 'totalPrice']],
+            where: {
+                isPaid: true
+            },
+            include: [{
+                model: Course,
+                required: true
+            }],
+            group: ['courseId']
+        });
+
+        const totalOfTotalPrices = totalPrice.reduce((acc, e) => acc + (+e.dataValues.totalPrice), 0);
+
+        // Return the total price
+        return totalOfTotalPrices;
+    };
+
+    async getTotalPriceOfPendingRequests() {
+        // Perform a join operation to get the total price based on student enrollment
+        const totalPrice = await courseStudentRepo.getAllWithSpec({
+            attributes: [[Sequelize.fn('SUM', Sequelize.col('price')), 'totalPrice']],
+            where: {
+                isPaid: false
+            },
+            include: [{
+                model: Course,
+                required: true
+            }],
+            group: ['courseId']
+        });
+
+        const totalOfTotalPrices = totalPrice.reduce((acc, e) => acc + (+e.dataValues.totalPrice), 0);
+
+        // Return the total price
+        return totalOfTotalPrices;
+    };
+
+    async getNumberOfStudentsPerCourse() {
+        // Query to get the number of students per course
+        const studentsPerCourse = await courseRepo.getAllWithSpec({
+            attributes: [
+                'id',
+                'name',
+                [Sequelize.literal('(SELECT COUNT(*) FROM coursestudent WHERE coursestudent.courseId = courses.id)'), 'numberOfStudents']
+            ],
+            raw: true,
+            nest: true
+        });
+
+        return studentsPerCourse;
     }
 
     async getCourseByTeacherId(teacherId) {
@@ -128,19 +183,19 @@ class CourseService {
     }
 
     async rejectRequest(id) {
-        const spec = new CourseStudentSpecifications([{isPaid : false}]).toQuery();
+        const spec = new CourseStudentSpecifications([{ isPaid: false }]).toQuery();
 
         const request = await courseStudentRepo.getWithSpec(spec);
 
-        if(!request) return null;
-        
+        if (!request) return null;
+
         return await courseStudentRepo.delete(id);
     }
 
-    async updateCourse(id , data) {
-        const course = courseRepo.update(id , data);
+    async updateCourse(id, data) {
+        const course = courseRepo.update(id, data);
 
-        if(!course) return null;
+        if (!course) return null;
 
         return course;
     }

@@ -4,7 +4,6 @@ import moment from 'moment';
 import bcrypt from "bcryptjs";
 import BaseSpecification from '../specifications/BaseSpecifications.js';
 import Status from '../models/status.model.js'
-import { DATEONLY, where } from 'sequelize';
 
 const userRepo = new BaseRepository(User);
 const statusRepo = new BaseRepository(Status);
@@ -56,6 +55,10 @@ class UserService {
         return status;
     }
 
+    async getUserCount(){
+        const userCount = await User.count();
+        return userCount;
+    }
     async createUser(data) {
 
         data.birthDate = moment(data.birthDate, "DD/MM/YYYY").format("YYYY-MM-DD");

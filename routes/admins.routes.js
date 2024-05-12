@@ -6,6 +6,7 @@ const router = express.Router();
 
 router
     .get("/", verifyAdmin, adminController.getAdmins)
+    .get("/stat" , verifyAdmin , adminController.getStats)
     .get("/:id", verifyAdmin, adminController.getAdminById)
     .post("/", adminController.createAdmin)
     .post("/login", adminController.login)
