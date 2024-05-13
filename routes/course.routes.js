@@ -11,6 +11,7 @@ router
     .get("/teachercourses" , verifyTeacher , courseController.getTeacherCourses)
     .get("/getcoursestudents/:id" , verifyTeacher , courseController.getCourseStudents)
     .get("/getstudentcourseactivities/:id" , verifyTeacher , courseController.getStudentCourseActivitiesForTeacher)
+    .get("/grades" , verifyUser , courseController.getStudentGrades)
     .get("/:id", courseController.getCourse)
     .post("/accept" , verifyAdmin , courseController.acceptRequest)
     .post("/reject" , verifyAdmin , courseController.rejectRequest)

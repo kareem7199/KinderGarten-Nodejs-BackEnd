@@ -8,7 +8,7 @@ import CourseWithStatusDto from '../dtos/course/CourseWithStatusDto.js'
 import PendingRequestsDto from "../dtos/courseStudent/PendingRequestsDto.js"
 import CourseStudentDto from "../dtos/courseStudent/CourseStudentDto.js"
 import CourseStudentActivityDto from "../dtos/courseStudent/CourseStudentActivityDto.js"
-
+import StudentGradeDto from "../dtos/courseStudent/StudentGradeDto.js"
 export const getCourses = async (req, res) => {
     try {
 
@@ -109,7 +109,18 @@ export const getStudentCourseActivitiesForTeacher = async (req, res) => {
         res.status(500).send(ApiErrorResponse.InternalServerError());
     }
 }
+export const getStudentGrades = async (req , res) => {
+    try {
+        const id = req.user.id;
+        const grades = await CourseService.getStudentGrades(id);
+        const gradesDto = new StudentGradeDto(grades).map();
 
+        res.send(ApiResponse.success(gradesDto));
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(ApiErrorResponse.InternalServerError());
+    }
+}
 export const addActivityToStudent = async (req, res) => {
     try {
 

@@ -10,7 +10,7 @@ class TeacherService {
 
     async getAllTeachers(){
         
-        const teachers = await teacherRepo.getAll();
+        const teachers = await teacherRepo.getAllWithSpec(new TeacherWithCoursesSpecifications().toQuery());
 
         return teachers;
     }
